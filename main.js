@@ -34,30 +34,39 @@ class TicTacToe {
 
   startGame() {
     console.log('Let\'s begin playing Tic-Tac-Toe.');
-    return console.log(this.showBoard());
+    return console.log(this.makeBoard());
   }
 
-  showBoard() {
+  makeBoard() {
     return this.row1.join('') + this.line + this.row2.join('') + this.line + this.row3.join('');
   }
 
-  changeMoves(nextMoveRow, nextMoveColumn) {
-    this.moves.push([nextMoveRow, nextMoveColumn]);
-    let rowToChange = this.rowHash[this.moves[this.moves.length-1][0]];
-    let colToChange = this.columnHash[this.moves[this.moves.length-1][1]];
-    this[rowToChange][colToChange] = this.count % 2 === 0 ? 'X' : 'O';
+  makeMove(nextMoveRow, nextMoveColumn) {
+    const newMove = [nextMoveRow, nextMoveColumn];
+    if (!JSON.stringify(this.moves).includes(JSON.stringify(newMove))) {
+      this.moves.push([nextMoveRow, nextMoveColumn]);
+
+      let rowToChange = this.rowHash[this.moves[this.moves.length - 1][0]];
+      let colToChange = this.columnHash[this.moves[this.moves.length - 1][1]];
+
+      this[rowToChange][colToChange] = this.count % 2 === 0 ? 'X' : 'O';
+
+      this.count += 1;
+    } else {
+      return console.log('This piece has already been played.')
+    }
   }
 
-  checkVictory(moves) {
-    const OneMoves = moves.filter((move, index) => index % 2 === 0);
-    const TwoMoves = moves.filter((move, index) => index % 2 === 1);
+  checkVictory() {
+    const OneMoves = this.moves.filter((move, index) => index % 2 === 0);
+    const TwoMoves = this.moves.filter((move, index) => index % 2 === 1);
 
     if (this._checkVictory(OneMoves)) {
       return 'Player 1';
     } else if (this._checkVictory(TwoMoves)) {
       return 'Player 2';
     } else {
-      return null
+      return null;
     }
   }
 
@@ -84,19 +93,13 @@ class TicTacToe {
       let nextMoveRow = readLineSync.question('What is your next move? Which row will you place your piece?\n');
       let nextMoveColumn = readLineSync.question('Which column?\n');
 
-      let newMove = [nextMoveRow, nextMoveColumn];
-      if (!JSON.stringify(this.moves).includes(JSON.stringify(newMove))) {
-        this.changeMoves(nextMoveRow, nextMoveColumn);
+      this.makeMove(nextMoveRow, nextMoveColumn);
 
-        let winner = this.checkVictory(this.moves);
-        if (winner) {
-          return console.log(winner, ' wins!');
-        } else {
-          this.count += 1;
-          console.log(this.showBoard());
-        }
+      let winner = this.checkVictory();
+      if (winner) {
+        console.log(winner, ' wins!\n', this.makeBoard());
       } else {
-        console.log('Sorry, this piece has already been filled.');
+        console.log(this.makeBoard());
       }
     }
     return console.log('It\'s a tie!');
@@ -105,3 +108,5 @@ class TicTacToe {
 
 let ticTacToe = new TicTacToe();
 ticTacToe.playGame();
+
+module.exports = TicTacToe;
